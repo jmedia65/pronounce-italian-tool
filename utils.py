@@ -70,9 +70,9 @@ def get_italian_phonetics(text):
     client_oai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))   
   
     prompt = f"""Convert this Italian text into simplified phonetic pronunciation: "{text}"
-    Format: Return only the pronunciation with syllables separated by hyphens, stressed syllable in CAPS, all wrapped in parentheses.
-    Example format: "conoscerti" should return "(ko-no-SHER-tee)"
-    Only return the pronunciation in parentheses, no other text."""
+    Format: Return only the pronunciation with syllables separated by hyphens, stressed syllable in CAPS.
+    Example format: "conoscerti" should return "ko-no-SHER-tee" without quotes or parenthesis.
+    Only return the pronunciation, no other text, quotes, or parenthesis."""
     
     try:
         response = client_oai.chat.completions.create(

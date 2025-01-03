@@ -18,12 +18,10 @@ $(document).ready(function () {
       }),
       success: function (response) {
         if (response.translatedTextItalian) {
-          $("#translated-text").html(
-            `<strong>${response.translatedTextItalian}</strong>`
-          );
+          $("#translated-text").html(`${response.translatedTextItalian}`);
           // $("#translated-text").text(response.translatedTextItalian);
           if (response.phonetics) {
-            $("#phonetics-text").html(`<strong>${response.phonetics}</strong>`);
+            $("#phonetics-text").html(`${response.phonetics}`);
           }
           $("#audio-container").show();
           // Remove all audio-related code from here
