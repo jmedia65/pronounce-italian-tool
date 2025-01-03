@@ -1,0 +1,47 @@
+body {
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+}
+
+.navbar {
+  background: rgba(white, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+#page {
+  margin-top: 70px;
+}
+
+a {
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a.fw-normal:hover {
+  text-decoration: underline !important;
+}
+
+.accordion-button:not(.collapsed) {
+  color: #106efd;
+}
+
+.accordion-button:focus {
+  // outline: 0 !important;
+  // border: 0 !important;
+  box-shadow: none !important;
+}
+
+.blink {
+  animation: blink 1s linear infinite;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}

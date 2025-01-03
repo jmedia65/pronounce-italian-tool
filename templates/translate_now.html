@@ -1,0 +1,376 @@
+{% extends "base.html" %} 
+{% block title_tag %}
+<title>Translate Now: Instant Translation & Pronunciation Practice</title>
+{% endblock %} 
+{% block meta_description %}
+<meta name="description" content="Elevate your Italian learning with our Translate Now feature, created for quick translations and pronunciation practice."/>
+{% endblock %} 
+{% block content %}
+<div class="row justify-content-md-center">
+  <div class="col-12 col-lg-8 py-3">
+    <h1 class="display-6 fw-bold">
+      Traduzioni e Pratica di Pronuncia Istantanee
+    </h1>
+    <p class="text-muted fs-4 pb-5 mb-5 border-bottom border-4">
+      Inserisci il testo per ottenere traduzioni e audio istantanei, poi esercita la tua pronuncia con feedback immediato.
+    </p>
+
+    <!-- translate now html -->
+    <div class="container my-3 py-3">
+      <h2 class="fw-bold">Traduci Ora</h2>
+      <div class="row mb-3">
+        <div class="col">
+          <select id="source-language" class="form-select">
+            <option value="it" selected>Italiano</option>
+            <!-- <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option> -->
+          </select>
+        </div>
+        <div class="col">
+          <select id="target-language" class="form-select" disabled>
+            <option value="en">Inglese</option>
+          </select>
+        </div>
+      </div>
+      <div class="mb-3">
+        <textarea
+          id="input-text"
+          class="form-control"
+          rows="3"
+          placeholder="Inserisci il testo da tradurre"
+          maxlength="150"
+        ></textarea>
+      </div>
+      <button id="translate-button" class="btn btn-primary btn-lg">
+        Traduci
+      </button>
+      <div class="mt-3">
+        <h2 class="fw-bold">Traduzione</h2>
+          <div id="translated-text" class="border p-3" style="min-height: 75px"></div>
+        <div
+          id="audio-container"
+          class="text-center mt-3"
+          style="display: none"
+        >
+          <img
+            src="/static/audio/play-audio-icon.png"
+            class="play-icon-inline"
+            style="cursor: pointer"
+          />
+          <p class="fs-5">Clicca/Tocca l'icona sopra per ascoltare la traduzione.</p>
+        </div>
+      </div>
+      <!-- Add new elements for pronunciation grading -->
+      <div id="pronunciation-grading" style="display: none;">
+        <h2 class="fw-bold mt-4">Valutazione della Pronuncia</h2>
+        <div class="mb-3">
+          <button id="start-recording" class="btn btn-primary">Inizia Registrazione</button>
+          <button id="stop-recording" class="btn btn-danger" disabled>Ferma Registrazione</button>
+          <button id="reset-all" class="btn btn-secondary">Azzera</button>
+        </div>
+        <div id="recording-status" class="mb-3"></div>
+        <div id="grading-status" class="mb-3"></div>
+        <div id="pronunciation-score" class="mb-3"></div>
+        <div id="word-scores" class="mb-3"></div>
+        <div id="words-to-practice" class="mb-3"></div>
+      </div>
+    </div>  
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        const audio = new Audio(); // Create an audio object
+      
+        // Variables for pronunciation grading
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+      
+        // Function to start recording
+        function startRecording() {
+          navigator.mediaDevices
+            .getUserMedia({ audio: true })
+            .then(function (stream) {
+              let mimeType = 'audio/webm';
+              if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+                  mimeType = 'audio/mp4';
+              }
+
+              // Check if the selected MIME type is supported
+              if (MediaRecorder.isTypeSupported(mimeType)) {
+                mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
+              } else {
+                // Fallback to default MIME type if the selected one is not supported
+                console.warn(`${mimeType} is not supported, using default MIME type.`);
+                mediaRecorder = new MediaRecorder(stream);
+              }
+
+              mediaRecorder.start();
+              audioChunks = [];
+              mediaRecorder.ondataavailable = function (event) {
+                audioChunks.push(event.data);
+              };
+              isRecording = true;
+              $("#start-recording").prop("disabled", true);
+              $("#stop-recording").prop("disabled", false);
+              $("#recording-status").text("Registrazione in corso...");
+            })
+            .catch(function (err) {
+              console.error("Error accessing microphone:", err);
+            });
+        }
+      
+        // Function to stop recording
+        function stopRecording() {
+          if (!mediaRecorder || !isRecording) {
+            console.error("No active recording found");
+            return;
+          }
+
+          mediaRecorder.stop();
+          isRecording = false;
+          $("#start-recording").prop("disabled", false);
+          $("#stop-recording").prop("disabled", true);
+          $("#recording-status").text("Registrazione terminata.");
+
+          // Create a Promise to handle the audioBlob
+          new Promise(resolve => {
+            mediaRecorder.onstop = () => {
+              const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
+              resolve(audioBlob);
+            };
+          })
+          .then(audioBlob => audioBlob.arrayBuffer())
+          .then(async arrayBuffer => {
+            try {
+              const wavBlob = await convertToWav(arrayBuffer);
+              
+              const formData = new FormData();
+              formData.append("audio", wavBlob, "recording.wav");
+              formData.append("reference_text", $("#translated-text").text());
+
+              $.ajax({
+                type: "POST",
+                url: "/grade-pronunciation",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                  displayPronunciationResults(response);
+                },
+                error: function(xhr, status, error) {
+                  console.error("Error grading pronunciation:", error);
+                  $("#grading-status").text("Error grading pronunciation: " + error);
+                }
+              });
+            } catch (error) {
+              console.error("Error converting audio:", error);
+              $("#grading-status").text("Error converting audio format: " + error.message);
+            }
+          });
+        }
+      
+        // Helper function to convert ArrayBuffer to WAV
+        async function convertToWav(arrayBuffer) {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+          return new Blob([audioBufferToWav(audioBuffer)], { type: "audio/wav" });
+        }
+      
+        // Function to convert AudioBuffer to WAV format
+        function audioBufferToWav(buffer) {
+          const numChannels = buffer.numberOfChannels;
+          const sampleRate = buffer.sampleRate;
+          const format = 1; // PCM = 1
+          const bitDepth = 16;
+
+          let result;
+          if (numChannels === 2) {
+            result = interleave(buffer.getChannelData(0), buffer.getChannelData(1));
+          } else {
+            result = buffer.getChannelData(0);
+          }
+
+          const bytesPerSample = bitDepth / 8;
+          const blockAlign = numChannels * bytesPerSample;
+
+          const bufferLength = 44 + (result.length * numChannels * bytesPerSample);
+          const arrayBuffer = new ArrayBuffer(bufferLength);
+          const view = new DataView(arrayBuffer);
+
+          // Write WAV header
+          writeString(view, 0, 'RIFF');
+          view.setUint32(4, bufferLength - 8, true);
+          writeString(view, 8, 'WAVE');
+          writeString(view, 12, 'fmt ');
+          view.setUint32(16, 16, true);
+          view.setUint16(20, format, true);
+          view.setUint16(22, numChannels, true);
+          view.setUint32(24, sampleRate, true);
+          view.setUint32(28, sampleRate * blockAlign, true);
+          view.setUint16(32, blockAlign, true);
+          view.setUint16(34, bitDepth, true);
+          writeString(view, 36, 'data');
+          view.setUint32(40, result.length * bytesPerSample, true);
+
+          // Write audio data
+          floatTo16BitPCM(view, 44, result);
+
+          return arrayBuffer;
+        }
+
+        function interleave(inputL, inputR) {
+          const length = inputL.length + inputR.length;
+          const result = new Float32Array(length);
+
+          let index = 0;
+          let inputIndex = 0;
+
+          while (index < length) {
+            result[index++] = inputL[inputIndex];
+            result[index++] = inputR[inputIndex];
+            inputIndex++;
+          }
+          return result;
+        }
+      
+        function floatTo16BitPCM(output, offset, input) {
+          for (let i = 0; i < input.length; i++, offset += 2) {
+            const s = Math.max(-1, Math.min(1, input[i]));
+            output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+          }
+        }
+      
+        function writeString(view, offset, string) {
+          for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+          }
+        }
+      
+        // Function to display pronunciation results
+        function displayPronunciationResults(results) {
+          const pronunciationAssessment = results.NBest[0].PronunciationAssessment;
+          const overallScore = pronunciationAssessment.PronScore || "N/A";
+          const accuracyScore = pronunciationAssessment.AccuracyScore || "N/A";
+          const fluencyScore = pronunciationAssessment.FluencyScore || "N/A";
+          const completenessScore = pronunciationAssessment.CompletenessScore || "N/A";
+      
+          $("#pronunciation-score").html(`
+            <p><strong>Punteggio Totale:</strong> ${overallScore}%</p>
+            <p><strong>Punteggio Precisione:</strong> ${accuracyScore}%</p>
+            <p><strong>Punteggio Fluidità:</strong> ${fluencyScore}%</p>
+            <p><strong>Punteggio Completezza:</strong> ${completenessScore}%</p>
+          `);
+      
+          const wordScores = results.NBest[0].Words.map(word => ({
+            word: word.Word,
+            score: word.PronunciationAssessment.AccuracyScore
+          }));
+
+          let wordScoresHTML = "";
+          wordScores.forEach(function (wordScore) {
+            wordScoresHTML += `<span class="badge bg-${getWordScoreColor(
+              wordScore.score
+            )}">${wordScore.word} (${wordScore.score.toFixed(1)}%)</span> `;
+          });
+          $("#word-scores").html(wordScoresHTML);
+      
+          const wordsToPractice = wordScores.filter(wordScore => wordScore.score < 80);
+          let wordsToPracticeHTML = "";
+          wordsToPractice.forEach(function (wordScore) {
+            wordsToPracticeHTML += `<p>${wordScore.word} (${wordScore.score.toFixed(1)}%)</p>`;
+          });
+          $("#words-to-practice").html(wordsToPracticeHTML);
+      
+          $("#pronunciation-grading").show();
+        }
+      
+        // Function to get word score color
+        function getWordScoreColor(score) {
+          if (score >= 80) {
+            return "success";
+          } else if (score >= 60) {
+            return "warning";
+          } else {
+            return "danger";
+          }
+        }
+      
+        // Function to translate text and show pronunciation grading
+        function translateText() {
+          const text = $("#input-text").val();
+          const sourceLanguage = $("#source-language").val();
+      
+          if (text.trim() === "") {
+            alert("Please enter some text to translate.");
+            return;
+          }
+      
+          $.ajax({
+            type: "POST",
+            url: "/translate-now",
+            contentType: "application/json",
+            data: JSON.stringify({
+              text: text,
+              source_language: sourceLanguage,
+            }),
+            success: function (response) {
+              if (response.translatedTextItalian) {
+                $("#translated-text").text(response.translatedTextItalian);
+                $("#audio-container").show();
+      
+                // Set the audio source and prepare to play
+                audio.src = "data:audio/mp3;base64," + response.audio;
+                $(".play-icon-inline").click(function () {
+                  audio.play().catch((error) => {
+                    console.error("Failed to play audio:", error);
+                  });
+                });
+      
+                // Show the pronunciation grading section
+                $("#pronunciation-grading").show();
+              } else {
+                console.error("Translation failed");
+              }
+            },
+            error: function () {
+              console.error("Error in translation request");
+            },
+          });
+        }
+      
+        // Event listeners
+      $("#translate-button").click(translateText);
+      $("#start-recording").click(startRecording);
+      $("#stop-recording").click(stopRecording);
+      $("#reset-all").click(function() {     // Add this block
+          // Reset the form
+          $("#input-text").val("");
+          $("#translated-text").empty();
+          $("#pronunciation-grading").hide();
+          $("#audio-container").hide();
+          $("#recording-status").empty();
+          $("#grading-status").empty();
+          $("#pronunciation-score").empty();
+          $("#word-scores").empty();
+          $("#words-to-practice").empty();
+          
+          // Reset buttons
+          $("#start-recording").prop("disabled", false);
+          $("#stop-recording").prop("disabled", true);
+          
+          // Reset recording state
+          isRecording = false;
+          audioChunks = [];
+          if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+              mediaRecorder.stop();
+          }
+      });
+  });
+</script>
+{% endblock %}

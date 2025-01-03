@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {% block title_tag %}{% endblock %} {% block meta_description %}{% endblock
+    %} {% block canonical_tag %}{% endblock %}
+    <meta name="author" content="ItalianChat by LearnItalianPod" />
+    <meta name="theme-color" content="#000000" />
+    <!-- favicon -->
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='img/favicon.ico') }}"
+    />
+    <!-- bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <!-- font-awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <!-- css -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+    <!-- local css important for the bot -->
+    <!-- <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet"/>     -->
+    <!-- google tag -->
+    {# {% include "_google_tag.html" %} #}
+    <style>
+      .gl-audio-container {
+        border-radius: 0.25rem; /* Rounded corners */
+        background-color: #f8f9fa; /* Light background for visibility */
+        /* border: 1px solid #dee2e6; Border for separation */
+        padding: 1rem; /* Padding for spacing */
+        margin-bottom: 1rem; /* Margin for spacing from other elements */
+        text-align: center; /* Center align the audio element */
+      }
+
+      .gl-audio-container audio {
+        width: 100%; /* Full width */
+        outline: none; /* Remove outline */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- page starts -->
+    {% include "_navbar.html" %}
+    <div id="page" class="container py-2 pb-5">
+      {% block content %} {% endblock %} {% include "_footer.html" %}
+    </div>
+    <!-- page ends -->
+
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- stripe -->
+    <!-- <script src="https://js.stripe.com/v3/"></script> -->
+    <!-- main.js -->
+    <!-- <script src="{{ url_for('static', filename='js/main.min.js') }}"></script> -->
+    <!-- bootstrap js -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <!-- bootstrap lightbox -->
+    <script src="https://cdn.jsdelivr.net/npm/bs5-lightbox@1.8.3/dist/index.bundle.min.js"></script>
+
+    <!-- app js files-->
+    <!-- <script src="{{ url_for('static', filename='js/speech_to_text.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ai_chatbot.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/get_hint.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/flashcard.js') }}"></script> -->
+    <script src="{{ url_for('static', filename='js/translate_now.js') }}"></script>
+
+    {% block scripts %} {% endblock %}
+
+    <!-- inline play audio icon -->
+    <script>
+      function playAudio(audioUrl) {
+        var audio = new Audio(audioUrl);
+        audio.play();
+      }
+    </script>
+  </body>
+</html>

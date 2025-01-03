@@ -1,0 +1,64 @@
+<nav
+  class="navbar navbar-expand-md navbar-light fixed-top shadow-sm"
+  style="background-color: #f0f6ff"
+>
+  <div class="container">
+    <!-- navbar -->
+    
+     <a href="{{ url_for('index') }}"
+      class="d-flex align-items-center text-body-emphasis text-decoration-none me-4"
+    >
+      <img
+        src="{{ url_for('static', filename='img/logo-100x100.svg') }}"
+        class="me-2"
+        style="height: 45px; width: 45px"
+      />
+      <span class="fs-3" style="color: #454545"
+        ><strong>Parla Inglese Online</strong></span
+      >
+    </a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarCollapse"
+      aria-controls="navbarCollapse"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+        <li class="nav-item">
+          <a class="nav-link fw-bold" href="{{ url_for('translate_now') }}"
+            >Pratica la Pronuncia</a
+          >
+        </li>
+      </ul>
+      
+      <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+        {% if current_user.is_authenticated %}
+          <li class="nav-item">
+            <span class="nav-link fw-bold" style="color: #454545">
+              Ciao, {{ current_user.username }}
+            </span>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link fw-bold" href="{{ url_for('logout') }}">
+              Esci
+            </a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link fw-bold" href="{{ url_for('login') }}">
+              Accedi
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
