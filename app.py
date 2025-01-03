@@ -97,8 +97,8 @@ def translate_now():
     if request.method == "POST":
         data = request.json
         text = data.get('text')
-        source_language = data.get('source_language', 'it')  # Default to English if not provided
-        target_language = 'en'  # Always translate to Italian
+        source_language = data.get('source_language', 'en')  # Default to English if not provided
+        target_language = 'it'  # Always translate to Italian
 
         translated_text_ita = translate_text_italian(text, source_language, target_language)
         translated_text_ita = html.unescape(translated_text_ita)  # Decode HTML entities
@@ -147,7 +147,7 @@ def grade_pronunciation():
         pronunciation_config.reference_text = reference_text
 
         # Create a speech recognizer
-        language = 'en-US'
+        language = 'it-IT'
         speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, language=language, audio_config=audio_config)
         # Apply pronunciation assessment config to speech recognizer
         pronunciation_config.apply_to(speech_recognizer)

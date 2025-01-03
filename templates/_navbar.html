@@ -14,7 +14,7 @@
         style="height: 45px; width: 45px"
       />
       <span class="fs-3" style="color: #454545"
-        ><strong>Parla Inglese Online</strong></span
+        ><strong>Italian Pronunciation</strong></span
       >
     </a>
 
@@ -31,13 +31,13 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarCollapse">
-      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+      <!-- <ul class="navbar-nav me-auto mb-2 mb-md-0">
         <li class="nav-item">
           <a class="nav-link fw-bold" href="{{ url_for('translate_now') }}"
             >Pratica la Pronuncia</a
           >
         </li>
-      </ul>
+      </ul> -->
       
       <ul class="navbar-nav ms-auto mb-2 mb-md-0">
         {% if current_user.is_authenticated %}
@@ -48,13 +48,13 @@
           </li>
           <li class="nav-item">
             <a class="nav-link fw-bold" href="{{ url_for('logout') }}">
-              Esci
+              Logout
             </a>
           </li>
         {% else %}
           <li class="nav-item">
             <a class="nav-link fw-bold" href="{{ url_for('login') }}">
-              Accedi
+              Login
             </a>
           </li>
         {% endif %}

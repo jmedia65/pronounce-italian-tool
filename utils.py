@@ -20,7 +20,7 @@ credentials = service_account.Credentials.from_service_account_file(credentials_
 ####################################################################
 ####### GOOGLE TEXT-TO-SPEECH > WORKING ######################
 # function for text to speech for the talking bot 
-def text_to_speech(text, language_code='en-US', return_audio=True):
+def text_to_speech(text, language_code='it-IT', return_audio=True):
     client = texttospeech.TextToSpeechClient()
     synthesis_input = texttospeech.SynthesisInput(text=text)
 
@@ -51,7 +51,7 @@ def text_to_speech(text, language_code='en-US', return_audio=True):
 
 ################################################################ 
 # translate now function 
-def translate_text_italian(text, source_language='it', target_language='en'):
+def translate_text_italian(text, source_language='en', target_language='it'):
     translate_client = translate.Client()
     result = translate_client.translate(text, source_language=source_language, target_language=target_language)
     return result['translatedText']

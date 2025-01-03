@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    {% block title_tag %}{% endblock %} {% block meta_description %}{% endblock
-    %} {% block canonical_tag %}{% endblock %}
+    {% block title_tag %}{% endblock %} 
+    {% block meta_description %}{% endblock %} 
+    {% block canonical_tag %}{% endblock %}
     <meta name="author" content="ItalianChat by LearnItalianPod" />
     <meta name="theme-color" content="#000000" />
     <!-- favicon -->
@@ -32,9 +33,7 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/main.css') }}"
     />
-    <!-- local css important for the bot -->
-    <!-- <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet"/>     -->
-    <!-- google tag -->
+     <!-- google tag -->
     {# {% include "_google_tag.html" %} #}
     <style>
       .gl-audio-container {
@@ -56,30 +55,19 @@
     <!-- page starts -->
     {% include "_navbar.html" %}
     <div id="page" class="container py-2 pb-5">
-      {% block content %} {% endblock %} {% include "_footer.html" %}
+      {% block content %} {% endblock %}     
     </div>
+    {% include "_footer.html" %}
     <!-- page ends -->
 
     <!-- jquery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- stripe -->
-    <!-- <script src="https://js.stripe.com/v3/"></script> -->
-    <!-- main.js -->
-    <!-- <script src="{{ url_for('static', filename='js/main.min.js') }}"></script> -->
-    <!-- bootstrap js -->
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
-    <!-- bootstrap lightbox -->
-    <script src="https://cdn.jsdelivr.net/npm/bs5-lightbox@1.8.3/dist/index.bundle.min.js"></script>
-
-    <!-- app js files-->
-    <!-- <script src="{{ url_for('static', filename='js/speech_to_text.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/ai_chatbot.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/get_hint.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/flashcard.js') }}"></script> -->
+    <!-- translate now js -->
     <script src="{{ url_for('static', filename='js/translate_now.js') }}"></script>
 
     {% block scripts %} {% endblock %}

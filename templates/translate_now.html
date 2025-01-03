@@ -1,35 +1,35 @@
 {% extends "base.html" %} 
+
 {% block title_tag %}
-<title>Translate Now: Instant Translation & Pronunciation Practice</title>
+<title>Instant Translations and Pronunciation Practice</title>
 {% endblock %} 
 {% block meta_description %}
 <meta name="description" content="Elevate your Italian learning with our Translate Now feature, created for quick translations and pronunciation practice."/>
 {% endblock %} 
+
 {% block content %}
 <div class="row justify-content-md-center">
   <div class="col-12 col-lg-8 py-3">
     <h1 class="display-6 fw-bold">
-      Traduzioni e Pratica di Pronuncia Istantanee
+      Instant Translations and Pronunciation Practice
     </h1>
     <p class="text-muted fs-4 pb-5 mb-5 border-bottom border-4">
-      Inserisci il testo per ottenere traduzioni e audio istantanei, poi esercita la tua pronuncia con feedback immediato.
+      Enter text for instant translation and audio, then practice your pronunciation with instant feedback.
     </p>
 
     <!-- translate now html -->
-    <div class="container my-3 py-3">
-      <h2 class="fw-bold">Traduci Ora</h2>
       <div class="row mb-3">
         <div class="col">
           <select id="source-language" class="form-select">
-            <option value="it" selected>Italiano</option>
-            <!-- <option value="es">Spanish</option>
+            <option value="en" selected>English or Italian</option>
+            <!-- <option value="it">Italian</option>
             <option value="fr">French</option>
             <option value="de">German</option> -->
           </select>
         </div>
         <div class="col">
           <select id="target-language" class="form-select" disabled>
-            <option value="en">Inglese</option>
+            <option value="it">Italian</option>
           </select>
         </div>
       </div>
@@ -38,15 +38,15 @@
           id="input-text"
           class="form-control"
           rows="3"
-          placeholder="Inserisci il testo da tradurre"
+          placeholder="Enter the text you want to practice."
           maxlength="150"
         ></textarea>
       </div>
       <button id="translate-button" class="btn btn-primary btn-lg">
-        Traduci
+        Translate & Practice
       </button>
       <div class="mt-3">
-        <h2 class="fw-bold">Traduzione</h2>
+        <h2 class="fw-bold">Translation</h2>
           <div id="translated-text" class="border p-3" style="min-height: 75px"></div>
         <div
           id="audio-container"
@@ -58,16 +58,16 @@
             class="play-icon-inline"
             style="cursor: pointer"
           />
-          <p class="fs-5">Clicca/Tocca l'icona sopra per ascoltare la traduzione.</p>
+          <p class="fs-5">Click/Tap the icon above to listen to the translation</p>
         </div>
       </div>
       <!-- Add new elements for pronunciation grading -->
       <div id="pronunciation-grading" style="display: none;">
-        <h2 class="fw-bold mt-4">Valutazione della Pronuncia</h2>
+        <h2 class="fw-bold mt-4">Evaluation of Pronunciation</h2>
         <div class="mb-3">
-          <button id="start-recording" class="btn btn-primary">Inizia Registrazione</button>
-          <button id="stop-recording" class="btn btn-danger" disabled>Ferma Registrazione</button>
-          <button id="reset-all" class="btn btn-secondary">Azzera</button>
+          <button id="start-recording" class="btn btn-primary">Start Recording</button>
+          <button id="stop-recording" class="btn btn-danger" disabled>Stop Recording</button>
+          <button id="reset-all" class="btn btn-secondary">Reset</button>
         </div>
         <div id="recording-status" class="mb-3"></div>
         <div id="grading-status" class="mb-3"></div>
@@ -136,7 +136,7 @@
           isRecording = false;
           $("#start-recording").prop("disabled", false);
           $("#stop-recording").prop("disabled", true);
-          $("#recording-status").text("Registrazione terminata.");
+          $("#recording-status").text("Recording ended.");
 
           // Create a Promise to handle the audioBlob
           new Promise(resolve => {
@@ -261,10 +261,10 @@
           const completenessScore = pronunciationAssessment.CompletenessScore || "N/A";
       
           $("#pronunciation-score").html(`
-            <p><strong>Punteggio Totale:</strong> ${overallScore}%</p>
-            <p><strong>Punteggio Precisione:</strong> ${accuracyScore}%</p>
-            <p><strong>Punteggio Fluidità:</strong> ${fluencyScore}%</p>
-            <p><strong>Punteggio Completezza:</strong> ${completenessScore}%</p>
+            <p><strong>Total Pronunciation Score:</strong> ${overallScore}%</p>
+            <p><strong>Accuracy Score:</strong> ${accuracyScore}%</p>
+            <p><strong>Fluency Score:</strong> ${fluencyScore}%</p>
+            <p><strong>Completeness Score:</strong> ${completenessScore}%</p>
           `);
       
           const wordScores = results.NBest[0].Words.map(word => ({
