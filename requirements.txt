@@ -27,8 +27,9 @@ httpx==0.28.0
 idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.4
+jiter==0.8.2
 MarkupSafe==3.0.2
-openai==1.20.0
+openai==1.58.1
 packaging==24.2
 proto-plus==1.25.0
 protobuf==4.25.5

@@ -5,7 +5,8 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 from utils import ( 
     text_to_speech,
-    translate_text_italian
+    translate_text_italian,
+    get_italian_phonetics
 )
 import base64
 import html
@@ -96,16 +97,27 @@ def translate_now():
     
     if request.method == "POST":
         data = request.json
-        text = data.get('text')
+        text = data.get('text', '').strip()
+        
+        # Input validation
+        if not text:
+            return jsonify({"error": "Text is required"}), 400
+        if len(text) > 50:  # Match frontend limit
+            return jsonify({"error": "Text exceeds maximum length"}), 400
+        
         source_language = data.get('source_language', 'en')  # Default to English if not provided
         target_language = 'it'  # Always translate to Italian
 
         translated_text_ita = translate_text_italian(text, source_language, target_language)
         translated_text_ita = html.unescape(translated_text_ita)  # Decode HTML entities
+        
+        # Get phonetics for the Italian text
+        phonetics = get_italian_phonetics(translated_text_ita)
+        
         audio_content = text_to_speech(translated_text_ita)  # Generate audio for the translated text
         audio_data = base64.b64encode(audio_content).decode('utf-8')  # Convert audio content to base64
 
-        return jsonify({"translatedTextItalian": translated_text_ita, "audio": audio_data})
+        return jsonify({"translatedTextItalian": translated_text_ita, "phonetics": phonetics, "audio": audio_data})
     else:
         return render_template("translate_now.html")
 

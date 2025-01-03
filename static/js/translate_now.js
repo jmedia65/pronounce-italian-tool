@@ -18,15 +18,31 @@ $(document).ready(function () {
       }),
       success: function (response) {
         if (response.translatedTextItalian) {
-          $("#translated-text").text(response.translatedTextItalian);
+          $("#translated-text").html(
+            `<strong>${response.translatedTextItalian}</strong>`
+          );
+          // $("#translated-text").text(response.translatedTextItalian);
+          if (response.phonetics) {
+            $("#phonetics-text").html(`<strong>${response.phonetics}</strong>`);
+          }
           $("#audio-container").show();
           // Remove all audio-related code from here
         } else {
           console.error("Translation failed");
         }
       },
-      error: function () {
-        console.error("Error in translation request");
+      error: function (xhr) {
+        // Parse the error message from the response
+        const errorMessage =
+          xhr.responseJSON?.error || "An error occurred during translation";
+
+        // Display error message to user
+        $("#error-message").html(
+          `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+            ${errorMessage}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>`
+        );
       },
     });
   }

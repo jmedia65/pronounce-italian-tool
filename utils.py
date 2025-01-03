@@ -1,7 +1,7 @@
 #### UTILITY FUNCTIONS
 import os
 from dotenv import load_dotenv
-# from openai import OpenAI
+from openai import OpenAI
 # import configparser
 from google.cloud import texttospeech
 from google.oauth2 import service_account
@@ -9,9 +9,6 @@ from google.cloud import translate_v2 as translate
 
 # load environment variables
 load_dotenv()
-
-# config = configparser.ConfigParser()
-# client_oai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 ### google application credentials ###
 credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
@@ -55,3 +52,35 @@ def translate_text_italian(text, source_language='en', target_language='it'):
     translate_client = translate.Client()
     result = translate_client.translate(text, source_language=source_language, target_language=target_language)
     return result['translatedText']
+
+#################################################################
+# get phonetics from OpenAI
+def get_italian_phonetics(text):
+    """Get phonetic pronunciation for Italian text using OpenAI."""
+    
+    # Input validation
+    if not text or len(text.strip()) == 0:
+        return None
+        
+    # Enforce character limit
+    MAX_CHARS = 50  # Match frontend limit
+    text = text[:MAX_CHARS]
+    
+    # OpenAI stuff
+    client_oai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))   
+  
+    prompt = f"""Convert this Italian text into simplified phonetic pronunciation: "{text}"
+    Format: Return only the pronunciation with syllables separated by hyphens, stressed syllable in CAPS, all wrapped in parentheses.
+    Example format: "conoscerti" should return "(ko-no-SHER-tee)"
+    Only return the pronunciation in parentheses, no other text."""
+    
+    try:
+        response = client_oai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Error getting phonetics: {e}")
+        return None
